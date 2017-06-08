@@ -1,0 +1,49 @@
+{
+  "name": "op_rp_example",
+  "version": "1.0.0",
+  "description": "there are two files. op and rp. - npm install or yarn install - node op - node rp",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jiang-12196/op_rp_example.git"
+  },
+  "keywords": [
+    "openid",
+    "connect;",
+    "op",
+    "and",
+    "rp",
+    "example"
+  ],
+  "author": "damon.jiang",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jiang-12196/op_rp_example/issues"
+  },
+  "homepage": "https://github.com/jiang-12196/op_rp_example#readme",
+  "dependencies": {
+    "base64url": "^2.0.0",
+    "buffer-equals-constant": "^1.0.0",
+    "debug": "^2.4.4",
+    "ejs": "^2.5.2",
+    "got": "^6.1.1",
+    "http-errors": "^1.4.0",
+    "kcors": "^1.2.1",
+    "koa": "^1.0.0",
+    "koa-body": "^2.1.0",
+    "koa-compose": "^2.3.0",
+    "koa-ejs": "^4.0.0",
+    "koa-router": "^5.2.3",
+    "lodash": "^4.5.0",
+    "lru-cache": "^4.0.0",
+    "node-jose": "^0.9.4",
+    "oidc-provider": "^1.15.11",
+    "oidc-token-hash": "^1.0.0",
+    "raw-body": "^2.1.7",
+    "uuid": "^3.0.0",
+    "valid-url": "^1.0.9"
+  }
+}
