@@ -9,6 +9,8 @@ const bodyParser = require('koa-body');
 const querystring = require('querystring');
 const Router = require('koa-router');
 const render = require('koa-ejs');
+const Koa = require('koa');
+const app = new Koa();
 
 const port = process.env.PORT || 3000;
 
@@ -36,13 +38,14 @@ provider.initialize({
   keystore: { keys: settings.certificates },
   integrity: { keys: settings.integrityKeys },
 }).then(() => {
-  render(provider.app, {
+  render(app, {
     cache: false,
     layout: '_layout',
     root: path.join(__dirname, 'views'),
   });
 
   provider.app.keys = ['some secret key', 'and also the old one'];
+  provider.app.proxy = true;
 
   if (process.env.NODE_ENV === 'production') {
     provider.app.proxy = true;
@@ -66,12 +69,12 @@ provider.initialize({
 
   const router = new Router();
 
-  router.get('/interaction/:grant', function* renderInteraction(next) {
-    const cookie = provider.interactionDetails(this.req);
-    const client = yield provider.Client.find(cookie.params.client_id);
+  router.get('/interaction/:grant', async(ctx, next) => {
+    const cookie = provider.interactionDetails(ctx.req);
+    const client = await provider.Client.find(cookie.params.client_id);
 
     if (cookie.interaction.error === 'login_required') {
-      yield this.render('login', {
+      await ctx.render('login', {
         client,
         cookie,
         title: 'Sign-in',
@@ -83,7 +86,7 @@ provider.initialize({
         }),
       });
     } else {
-      yield this.render('interaction', {
+        await ctx.render('interaction', {
         client,
         cookie,
         title: 'Authorize',
@@ -96,37 +99,42 @@ provider.initialize({
       });
     }
 
-    yield next;
+    return next();
   });
 
   const body = bodyParser();
 
-  router.post('/interaction/:grant/confirm', body, function* submitConfirmationForm(next) {
+  router.post('/interaction/:grant/confirm', async(ctx, next) => {
     const result = { consent: {} };
-    provider.interactionFinished(this.req, this.res, result);
-    yield next;
+    provider.interactionFinished(ctx.req, ctx.res, result);
+    return next();
   });
 
-  router.post('/interaction/:grant/login', body, function* submitLoginForm() {
-    const account = yield Account.findByLogin(this.request.body.login);
+  router.post('/interaction/:grant/login', async(ctx, next) => {
+    const account = await Account.findByLogin(ctx.request.body.login);
 
     const result = {
       login: {
         account: account.accountId,
         acr: 'urn:mace:incommon:iap:bronze',
         amr: ['pwd'],
-        remember: !!this.request.body.remember,
+        remember: !!ctx.request.body.remember,
         ts: Math.floor(Date.now() / 1000),
       },
       consent: {},
     };
 
-    provider.interactionFinished(this.req, this.res, result);
+    provider.interactionFinished(ctx.req, ctx.res, result);
   });
 
-  provider.app.use(router.routes());
+  app.use(async(ctx, next) => provider.callback);
+  app.use(router.routes());
+  app.use(router.allowedMethods());
+  app.listen(port)
 })
-.then(() => provider.app.listen(port))
+.then(() => {
+
+})
 .catch((err) => {
   console.error(err);
   process.exit(1);
