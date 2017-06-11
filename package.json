@@ -26,6 +26,7 @@
   "homepage": "https://github.com/jiang-12196/op_rp_example#readme",
   "dependencies": {
     "base64url": "^2.0.0",
+    "body-parser": "^1.17.2",
     "buffer-equals-constant": "^1.0.0",
     "crypto": "0.0.3",
     "debug": "^2.4.4",
