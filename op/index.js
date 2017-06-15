@@ -44,6 +44,7 @@ provider.initialize({
   integrity: { keys: settings.integrityKeys },
 }).then(() => {
   provider.app.keys = ['some secret key', 'and also the old one'];
+  provider.app.proxy = true;
   app.get('/interaction/:grant', async (req,res) => {
     const cookie = provider.interactionDetails(req);
     const client = await provider.Client.find(cookie.params.client_id);
